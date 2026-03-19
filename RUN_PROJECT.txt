@@ -1,0 +1,29 @@
+PROJECT RUN GUIDE
+
+Step 1: Open project folder in VS Code
+
+Step 2: Create virtual environment
+python -m venv .venv
+
+Step 3: Activate environment (Windows PowerShell)
+.\.venv\Scripts\Activate.ps1
+
+Step 4: Install dependencies
+pip install -r requirements.txt
+
+Step 5: Register Jupyter kernel
+python -m ipykernel install --user --name alz_env --display-name "Python (alz_env)"
+
+Step 6: Open notebooks folder
+
+Step 7: Run notebooks in order:
+
+1. 01_dataset_overview.ipynb
+2. 02_preprocessing_single_sample.ipynb
+3. 03_feature_extraction_single_sample.ipynb
+4. 04_feature_extraction_all_subjects.ipynb
+5. 05_progress_visualizations.ipynb
+
+NOTE:
+Dataset is already included in data/raw/ds004504/
+Outputs are already generated.
