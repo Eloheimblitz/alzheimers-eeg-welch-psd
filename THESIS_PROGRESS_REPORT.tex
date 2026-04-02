@@ -82,22 +82,21 @@ In the current phase of the work, the focus is on building a reliable and reprod
     \item Extract frequency-domain features using Welch PSD.
     \item Save subject-wise PSD features and summary outputs for later use.
     \item Implement and compare non-overlapping (0\%) and 50\% overlapping epoch segmentation pipelines.
-    \item Add a pilot single-CNN baseline workflow (EEGNet) for Phase 2 readiness.
 \end{itemize}
 
 \textbf{Phase 2 (Future Work):}
 \begin{itemize}[leftmargin=2em]
     \item Create subject-wise train, validation, and test splits.
-    \item Extend from the EEGNet pilot to full comparative modeling with ShallowConvNet, DeepConvNet, SCCNet, and FBCNet.
+    \item Implement comparative modeling with ShallowConvNet, DeepConvNet, SCCNet, FBCNet, and EEGNet.
     \item Train and evaluate all selected models using a unified experimental setup.
     \item Compare model performance using standard evaluation metrics.
 \end{itemize}
 
 \subsection{Current Progress}
 \begin{itemize}
-    \item Current status: Phase 1 completed with overlap-comparison extension and EEGNet pilot implementation
-    \item Completed scope: Dataset inspection, metadata creation, preprocessing, artifact rejection, epoch segmentation (0\% and 50\% overlap), Welch PSD extraction, output saving, progress visualization, and single-CNN baseline notebook integration
-    \item Estimated progress: Approximately 55--60\%
+    \item Current status: Phase 1 completed with overlap-comparison extension
+    \item Completed scope: Dataset inspection, metadata creation, preprocessing, artifact rejection, epoch segmentation (0\% and 50\% overlap), Welch PSD extraction, output saving, and progress visualization
+    \item Estimated progress: Approximately 50--55\%
 \end{itemize}
 
 \newpage
@@ -421,15 +420,47 @@ Example PSD shape (non-overlap) & \texttt{(138, 19, 89)} \\
 \end{tabular}
 \end{table}
 
-\subsection{Overlap versus Non-overlap Observation}
-After implementing both segmentation settings, the 50\% overlap pipeline produced approximately double the average retained epochs per subject (325.86) compared with the non-overlap baseline (163.18), while processing the same 88 subjects successfully. This confirms that overlap can substantially increase sample availability for downstream CNN training.
-
-\subsection{Single-CNN Baseline Preparation}
-A pilot EEGNet baseline workflow was added in \texttt{notebooks/06\_single\_cnn\_eegnet\_baseline.ipynb}, with supporting code in \texttt{src/eegnet\_baseline.py}. The notebook prepares subject-level PSD inputs and provides baseline comparison plots for overlap settings:
+\subsection{Execution Summary of Implemented Pipeline}
+To validate reproducibility, the Phase 1 notebooks were executed in sequence:
 \begin{itemize}
-    \item \texttt{results/figures/10\_eegnet\_accuracy\_bar\_comparison.png}
-    \item \texttt{results/figures/11\_eegnet\_accuracy\_dumbbell\_comparison.png}
+    \item \texttt{01\_dataset\_overview.ipynb}
+    \item \texttt{02\_preprocessing\_single\_sample.ipynb}
+    \item \texttt{03\_feature\_extraction\_single\_sample.ipynb}
+    \item \texttt{04\_feature\_extraction\_all\_subjects.ipynb}
+    \item \texttt{05\_progress\_visualizations.ipynb}
 \end{itemize}
+
+All five notebooks completed successfully and generated the expected outputs (metadata files, subject-wise PSD files, overlap comparison summaries, and updated report figures).
+
+\subsection{Overlap versus Non-overlap Observation}
+After implementing both segmentation settings, the 50\% overlap pipeline produced approximately double the average retained epochs per subject (325.86) compared with the non-overlap baseline (163.18), while processing the same 88 subjects successfully. This corresponds to nearly a 99.7\% increase in average retained epochs per subject.
+
+In practical terms, both settings preserve the same physiological recording context and preprocessing rules, but the 50\% overlap setting increases sample availability by using a 2-second shift between consecutive 4-second epochs. This is important for the next project phase because it enables larger model input sets without requiring additional data collection.
+
+\subsection{Output Completeness and Data Integrity}
+The generated outputs confirm that the Phase 1 pipeline is complete and internally consistent:
+\begin{itemize}
+    \item \textbf{Non-overlap feature files:} 88 subject-wise \texttt{.npz} files stored under
+    \path{data/processed/psd_features/}.
+    \item \textbf{50\% overlap feature files:} 88 subject-wise \texttt{.npz} files stored under
+    \path{data/processed/psd_features_overlap50/}.
+    \item \textbf{Summary files:} both
+    \path{data/metadata/psd_feature_summary.csv} and
+    \path{data/metadata/psd_feature_summary_overlap50.csv}
+    are available and populated for all matched subjects.
+    \item \textbf{Failure count:} 0 failures in both processing settings
+\end{itemize}
+
+These checks indicate that the pipeline is not only functionally correct but also robust at full-dataset scale.
+
+\subsection{Subject-level Variability}
+The retained epoch range varies across subjects in both settings:
+\begin{itemize}
+    \item Non-overlap: minimum 1, maximum 315 retained epochs
+    \item 50\% overlap: minimum 5, maximum 630 retained epochs
+\end{itemize}
+
+This variability is expected in real clinical EEG due to differences in recording quality and artifact burden across participants. Importantly, despite this variability, all subjects still produced valid PSD outputs, which supports downstream comparative modeling feasibility.
 
 \subsection{Class-wise Processing View}
 \begin{figure}[H]
@@ -455,7 +486,9 @@ A pilot EEGNet baseline workflow was added in \texttt{notebooks/06\_single\_cnn\
 \subsection{Interpretation of Results So Far}
 The results show that the implemented Phase 1 pipeline is functioning correctly on the local dataset. The dataset scan detected the expected total of 88 matched subjects, which agrees with the known participant count for this study. All matched subjects were processed successfully without stopping the pipeline.
 
-The retained epoch counts vary across subjects, which is expected due to different artifact levels in real EEG recordings. However, the pipeline still produced valid PSD features for every processed subject. This confirms that the current implementation is stable enough to support the next phase of the thesis, where the extracted features will be used for CNN-based experiments.
+The retained epoch counts vary across subjects, which is expected due to different artifact levels in real EEG recordings. However, the pipeline still produced valid PSD features for every processed subject under both segmentation settings. This indicates that the preprocessing and feature extraction modules are stable, reproducible, and suitable for transition into Phase 2 model development.
+
+Overall, the Phase 1 outcome is technically complete: data ingestion, quality-controlled preprocessing, overlap comparison, and standardized Welch PSD feature generation have all been verified and documented with saved outputs and figures. This provides a strong and traceable foundation for the comparative CNN experiments planned in the next phase.
 
 \newpage
 
@@ -467,8 +500,7 @@ The following tasks remain for the final phase of the thesis:
 \begin{itemize}
     \item prepare subject-wise train, validation, and test splits;
     \item apply stratified or group-aware evaluation design to prevent data leakage;
-    \item finalize EEGNet baseline training and evaluation runs;
-    \item implement remaining CNN models: ShallowConvNet, DeepConvNet, SCCNet, and FBCNet;
+    \item implement CNN models: EEGNet, ShallowConvNet, DeepConvNet, SCCNet, and FBCNet;
     \item load saved PSD features as inputs for model training;
     \item train all selected models under a common experimental setup;
     \item evaluate model performance using metrics such as accuracy, precision, recall, F1-score, and related measures;
@@ -492,11 +524,10 @@ This progress report documents the successful completion of the first major phas
     \item artifact rejection using fixed thresholds;
     \item Welch PSD feature extraction;
     \item saving subject-wise features and summary outputs for both segmentation settings;
-    \item pilot EEGNet baseline workflow integration for Phase 2 readiness;
     \item generation of progress-ready figures and visual summaries.
 \end{itemize}
 
-The most important outcome of this stage is that a clean, modular, and verified EEG feature extraction pipeline is now available for all valid subjects in the dataset under both segmentation settings. Since the current stage processed 88 matched subjects successfully and produced reusable PSD features, with an initial EEGNet baseline workflow prepared, the work is now ready to proceed into full CNN-based comparative modeling.
+The most important outcome of this stage is that a clean, modular, and verified EEG feature extraction pipeline is now available for all valid subjects in the dataset under both segmentation settings. Since the current stage processed 88 matched subjects successfully and produced reusable PSD features, the work is now ready to proceed into CNN-based comparative modeling in the next phase.
 
 \newpage
 
