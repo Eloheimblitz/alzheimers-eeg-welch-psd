@@ -23,6 +23,7 @@ class PreprocessingConfig:
     l_freq: float = 0.5
     h_freq: float = 45.0
     epoch_duration: float = 4.0
+    epoch_overlap: float = 0.0
     amplitude_threshold_uv: float = 150.0
     hf_band: tuple[float, float] = (20.0, 45.0)
     hf_ratio_threshold: float = 0.35
@@ -60,10 +61,15 @@ def make_fixed_length_epochs(
     config: PreprocessingConfig | None = None,
 ) -> mne.Epochs:
     config = config or PreprocessingConfig()
+    if config.epoch_overlap < 0:
+        raise ValueError("epoch_overlap must be >= 0 seconds")
+    if config.epoch_overlap >= config.epoch_duration:
+        raise ValueError("epoch_overlap must be smaller than epoch_duration")
+
     return mne.make_fixed_length_epochs(
         raw,
         duration=config.epoch_duration,
-        overlap=0.0,
+        overlap=config.epoch_overlap,
         preload=True,
         verbose="ERROR",
     )
