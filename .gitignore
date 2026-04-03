@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+.tmp/
 
 # Keep generated Phase 1 outputs, but do not version the raw OpenNeuro dataset
 data/raw/ds004504/

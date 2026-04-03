@@ -269,14 +269,15 @@ Artifact rejection was applied after epoch segmentation. Each epoch was checked 
     \item high-frequency artifact check in the 20--45 Hz band
 \end{itemize}
 
-These thresholds were kept fixed and non-tuned in order to maintain a stable baseline preprocessing pipeline for the progress phase.
+These thresholds were kept fixed and non-tuned to preserve a consistent preprocessing baseline across all subjects.
+
+The figure below summarizes epoch counts for \texttt{sub-001} under non-overlap (0\%) and 50\% overlap, showing total, retained, rejected, amplitude-rejected, and high-frequency-rejected epochs side by side. The overlap setting increases the total number of epochs, while the same rejection rules are applied.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{results/figures/artifact_rejection_sample.png}
-\caption{Artifact rejection summary for a sample subject}
+\includegraphics[width=0.95\textwidth]{results/figures/slide_assets/04_artifact_rejection_summary.png}
+\caption{Artifact rejection summary for \texttt{sub-001}: 0\% vs 50\% overlap}
 \end{figure}
-
 \subsubsection{Example Preprocessing Output}
 For the demonstration subject \texttt{sub-001}, the preprocessing stage produced the following verified output:
 \begin{itemize}
